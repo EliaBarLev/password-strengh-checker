@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./api
+    container_name: password_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ui
+    networks:
+      - app-network
+
+  ui:
+    build:
+      context: ./ui
+    container_name: password_ui
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "dev"]
+    working_dir: /app
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
