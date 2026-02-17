@@ -1,20 +1,22 @@
-# 1. Use Rust official image
-FROM rust:1.76 as builder
+# Stage 1: Build
+FROM rust:1.76 AS builder
 
-# 2. Set working directory to /app/api
-WORKDIR /app/api
+# Set working directory
+WORKDIR /app
 
-# 3. Copy API code
+# Copy API and Engine folders into /app
 COPY ./api ./api
-# Copy the engine as dependency
-COPY ../engine ../engine
+COPY ./engine ./engine
 
-# 4. Build the API in release mode
+# Build API in release mode
+WORKDIR /app/api
 RUN cargo build --release
 
-# 5. Use minimal runtime image
+# Stage 2: Minimal runtime
 FROM debian:bookworm-slim
 WORKDIR /app
+
+# Copy the compiled binary
 COPY --from=builder /app/api/target/release/password_api .
 
 EXPOSE 8080
